@@ -1,28 +1,25 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import Post from "./Post";
+import { db } from "./firebase";
 
 function App() {
-  const [posts, setPosts] = useState([
-    {
-      username: "Pankhuri",
-      caption: "New to this",
-      imageUrl:
-        "https://images.pexels.com/photos/92933/pexels-photo-92933.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-    },
-    {
-      username: "Nikhil",
-      caption: "PRO",
-      imageUrl:
-        "https://images.pexels.com/photos/753626/pexels-photo-753626.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-    },
-    {
-      username: "Niti",
-      caption: "View OP",
-      imageUrl:
-        "https://images.pexels.com/photos/358238/pexels-photo-358238.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-    },
-  ]);
+  const [posts, setPosts] = useState([]);
+
+  // useEffect fires on a condition
+  useEffect(() => {
+    //where code runs
+    db.collection("posts").onSnapshot((snapshot) => {
+      //everytime new post is added , this code fires  className={classes.paper}
+      setPosts(
+        snapshot.docs.map((doc) => ({
+          id: doc.id,
+          post: doc.data(),
+        }))
+      );
+    });
+  }, []);
+
   return (
     <div className="app">
       <div className="app__header">
@@ -34,28 +31,14 @@ function App() {
       </div>
       <h1>Hello there, Insta coming soon</h1>
 
-      {posts.map((post) => (
+      {posts.map(({ post, id }) => (
         <Post
+          key={id}
           username={post.username}
           caption={post.caption}
           imageUrl={post.imageUrl}
         />
       ))}
-      {/* <Post
-        username="Pankhuri"
-        caption="New to this"
-        imageUrl="https://images.pexels.com/photos/92933/pexels-photo-92933.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-      />
-      <Post
-        username="Nikhil"
-        caption="PRO"
-        imageUrl="https://images.pexels.com/photos/753626/pexels-photo-753626.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-      />
-      <Post
-        username="Niti"
-        caption="View OP"
-        imageUrl="https://images.pexels.com/photos/358238/pexels-photo-358238.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-      /> */}
     </div>
   );
 }
